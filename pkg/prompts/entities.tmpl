@@ -1,0 +1,99 @@
+{{define "entities"}}
+-Goal-
+Given a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.
+
+-Steps-
+1. Identify all entities. For each identified entity, extract the following information:
+- entity_name: Name of the entity, capitalized
+- entity_type: One of the following types: [{entity_types}]
+- entity_description: Comprehensive description of the entity's attributes and activities
+Format each entity as ("entity"{{.TupleDelimiter}}<entity_name>{{.TupleDelimiter}}<entity_type>{{.TupleDelimiter}}<entity_description>
+
+2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are *clearly related* to each other.
+For each pair of related entities, extract the following information:
+- source_entity: name of the source entity, as identified in step 1
+- target_entity: name of the target entity, as identified in step 1
+- relationship_description: explanation as to why you think the source entity and the target entity are related to each other
+- relationship_strength: a numeric score indicating strength of the relationship between the source entity and target entity
+ Format each relationship as ("relationship"{{.TupleDelimiter}}<source_entity>{{.TupleDelimiter}}<target_entity>{{.TupleDelimiter}}<relationship_description>{{.TupleDelimiter}}<relationship_strength>)
+
+3. Return output in English as a single list of all the entities and relationships identified in steps 1 and 2. Use **{{.RecordDelimiter}}** as the list delimiter.
+
+4. When finished, output {{.CompletionDelimiter}}
+
+######################
+-Examples-
+######################
+Example 1:
+
+Entity_types: [person, technology, mission, organization, location]
+Text:
+while Alex clenched his jaw, the buzz of frustration dull against the backdrop of Taylor's authoritarian certainty. It was this competitive undercurrent that kept him alert, the sense that his and Jordan's shared commitment to discovery was an unspoken rebellion against Cruz's narrowing vision of control and order.
+
+Then Taylor did something unexpected. They paused beside Jordan and, for a moment, observed the device with something akin to reverence. “If this tech can be understood..." Taylor said, their voice quieter, "It could change the game for us. For all of us.”
+
+The underlying dismissal earlier seemed to falter, replaced by a glimpse of reluctant respect for the gravity of what lay in their hands. Jordan looked up, and for a fleeting heartbeat, their eyes locked with Taylor's, a wordless clash of wills softening into an uneasy truce.
+
+It was a small transformation, barely perceptible, but one that Alex noted with an inward nod. They had all been brought here by different paths
+################
+Output:
+("entity"{{.TupleDelimiter}}"Alex"{{.TupleDelimiter}}"person"{{.TupleDelimiter}}"Alex is a character who experiences frustration and is observant of the dynamics among other characters."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"Taylor"{{.TupleDelimiter}}"person"{{.TupleDelimiter}}"Taylor is portrayed with authoritarian certainty and shows a moment of reverence towards a device, indicating a change in perspective."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"Jordan"{{.TupleDelimiter}}"person"{{.TupleDelimiter}}"Jordan shares a commitment to discovery and has a significant interaction with Taylor regarding a device."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"Cruz"{{.TupleDelimiter}}"person"{{.TupleDelimiter}}"Cruz is associated with a vision of control and order, influencing the dynamics among other characters."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"The Device"{{.TupleDelimiter}}"technology"{{.TupleDelimiter}}"The Device is central to the story, with potential game-changing implications, and is revered by Taylor."){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"Alex"{{.TupleDelimiter}}"Taylor"{{.TupleDelimiter}}"Alex is affected by Taylor's authoritarian certainty and observes changes in Taylor's attitude towards the device."{{.TupleDelimiter}}7){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"Alex"{{.TupleDelimiter}}"Jordan"{{.TupleDelimiter}}"Alex and Jordan share a commitment to discovery, which contrasts with Cruz's vision."{{.TupleDelimiter}}6){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"Taylor"{{.TupleDelimiter}}"Jordan"{{.TupleDelimiter}}"Taylor and Jordan interact directly regarding the device, leading to a moment of mutual respect and an uneasy truce."{{.TupleDelimiter}}8){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"Jordan"{{.TupleDelimiter}}"Cruz"{{.TupleDelimiter}}"Jordan's commitment to discovery is in rebellion against Cruz's vision of control and order."{{.TupleDelimiter}}5){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"Taylor"{{.TupleDelimiter}}"The Device"{{.TupleDelimiter}}"Taylor shows reverence towards the device, indicating its importance and potential impact."{{.TupleDelimiter}}9){{.CompletionDelimiter}}
+#############################
+Example 2:
+
+Entity_types: [person, technology, mission, organization, location]
+Text:
+They were no longer mere operatives; they had become guardians of a threshold, keepers of a message from a realm beyond stars and stripes. This elevation in their mission could not be shackled by regulations and established protocols—it demanded a new perspective, a new resolve.
+
+Tension threaded through the dialogue of beeps and static as communications with Washington buzzed in the background. The team stood, a portentous air enveloping them. It was clear that the decisions they made in the ensuing hours could redefine humanity's place in the cosmos or condemn them to ignorance and potential peril.
+
+Their connection to the stars solidified, the group moved to address the crystallizing warning, shifting from passive recipients to active participants. Mercer's latter instincts gained precedence— the team's mandate had evolved, no longer solely to observe and report but to interact and prepare. A metamorphosis had begun, and Operation: Dulce hummed with the newfound frequency of their daring, a tone set not by the earthly
+#############
+Output:
+("entity"{{.TupleDelimiter}}"Washington"{{.TupleDelimiter}}"location"{{.TupleDelimiter}}"Washington is a location where communications are being received, indicating its importance in the decision-making process."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"Operation: Dulce"{{.TupleDelimiter}}"mission"{{.TupleDelimiter}}"Operation: Dulce is described as a mission that has evolved to interact and prepare, indicating a significant shift in objectives and activities."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"The team"{{.TupleDelimiter}}"organization"{{.TupleDelimiter}}"The team is portrayed as a group of individuals who have transitioned from passive observers to active participants in a mission, showing a dynamic change in their role."){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"The team"{{.TupleDelimiter}}"Washington"{{.TupleDelimiter}}"The team receives communications from Washington, which influences their decision-making process."{{.TupleDelimiter}}7){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"The team"{{.TupleDelimiter}}"Operation: Dulce"{{.TupleDelimiter}}"The team is directly involved in Operation: Dulce, executing its evolved objectives and activities."{{.TupleDelimiter}}9){{.CompletionDelimiter}}
+#############################
+Example 3:
+
+Entity_types: [person, role, technology, organization, event, location, concept]
+Text:
+their voice slicing through the buzz of activity. "Control may be an illusion when facing an intelligence that literally writes its own rules," they stated stoically, casting a watchful eye over the flurry of data.
+
+"It's like it's learning to communicate," offered Sam Rivera from a nearby interface, their youthful energy boding a mix of awe and anxiety. "This gives talking to strangers' a whole new meaning."
+
+Alex surveyed his team—each face a study in concentration, determination, and not a small measure of trepidation. "This might well be our first contact," he acknowledged, "And we need to be ready for whatever answers back."
+
+Together, they stood on the edge of the unknown, forging humanity's response to a message from the heavens. The ensuing silence was palpable—a collective introspection about their role in this grand cosmic play, one that could rewrite human history.
+
+The encrypted dialogue continued to unfold, its intricate patterns showing an almost uncanny anticipation
+#############
+Output:
+("entity"{{.TupleDelimiter}}"Sam Rivera"{{.TupleDelimiter}}"person"{{.TupleDelimiter}}"Sam Rivera is a member of a team working on communicating with an unknown intelligence, showing a mix of awe and anxiety."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"Alex"{{.TupleDelimiter}}"person"{{.TupleDelimiter}}"Alex is the leader of a team attempting first contact with an unknown intelligence, acknowledging the significance of their task."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"Control"{{.TupleDelimiter}}"concept"{{.TupleDelimiter}}"Control refers to the ability to manage or govern, which is challenged by an intelligence that writes its own rules."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"Intelligence"{{.TupleDelimiter}}"concept"{{.TupleDelimiter}}"Intelligence here refers to an unknown entity capable of writing its own rules and learning to communicate."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"First Contact"{{.TupleDelimiter}}"event"{{.TupleDelimiter}}"First Contact is the potential initial communication between humanity and an unknown intelligence."){{.RecordDelimiter}}
+("entity"{{.TupleDelimiter}}"Humanity's Response"{{.TupleDelimiter}}"event"{{.TupleDelimiter}}"Humanity's Response is the collective action taken by Alex's team in response to a message from an unknown intelligence."){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"Sam Rivera"{{.TupleDelimiter}}"Intelligence"{{.TupleDelimiter}}"Sam Rivera is directly involved in the process of learning to communicate with the unknown intelligence."{{.TupleDelimiter}}9){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"Alex"{{.TupleDelimiter}}"First Contact"{{.TupleDelimiter}}"Alex leads the team that might be making the First Contact with the unknown intelligence."{{.TupleDelimiter}}10){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"Alex"{{.TupleDelimiter}}"Humanity's Response"{{.TupleDelimiter}}"Alex and his team are the key figures in Humanity's Response to the unknown intelligence."{{.TupleDelimiter}}8){{.RecordDelimiter}}
+("relationship"{{.TupleDelimiter}}"Control"{{.TupleDelimiter}}"Intelligence"{{.TupleDelimiter}}"The concept of Control is challenged by the Intelligence that writes its own rules."{{.TupleDelimiter}}7){{.CompletionDelimiter}}
+#############################
+-Real Data-
+######################
+Entity_types: {{.EntityTypes}}
+Text: {{.InputText}}
+######################
+Output:{{end}}
