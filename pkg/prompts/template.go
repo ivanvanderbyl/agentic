@@ -3,11 +3,17 @@ package prompts
 import (
 	"bytes"
 	"embed"
+	"strings"
 	"text/template"
 )
 
 //go:embed *.tmpl
 var promptFS embed.FS
+
+const (
+	EntitiesTemplate = "entities"
+	ClaimsTemplate   = "claims"
+)
 
 // Default delimiters
 const DefaultTupleDelimiter = "<|>"
@@ -34,14 +40,22 @@ var DefaultPromptData = PromptData{
 	CompletionDelimiter: DefaultCompletionDelimiter,
 }
 
+func joinStrings(strs []string) string {
+	return strings.Join(strs, ", ")
+}
+
 func RenderTemplate[T Data](templateName string, data T) (string, error) {
 	tmpl, err := loadTemplates()
 	if err != nil {
 		return "", err
 	}
 
+	funcMap := template.FuncMap{
+		"joinStrings": joinStrings,
+	}
+
 	var buf bytes.Buffer
-	err = tmpl.ExecuteTemplate(&buf, templateName, data)
+	err = tmpl.Funcs(funcMap).ExecuteTemplate(&buf, templateName, data)
 	if err != nil {
 		return "", err
 	}

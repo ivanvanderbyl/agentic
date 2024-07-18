@@ -17,4 +17,6 @@ func TestLoadingAndRendering(t *testing.T) {
 	result, err := RenderTemplate("entities", TestData{EntityTypes: "person,place,thing", PromptData: DefaultPromptData})
 	a.NoError(err)
 	a.Contains(result, "person,place,thing")
+
+	t.Log(result)
 }
