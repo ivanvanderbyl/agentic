@@ -14,6 +14,8 @@ const DefaultTupleDelimiter = "<|>"
 const DefaultRecordDelimiter = "##"
 const DefaultCompletionDelimiter = "<|COMPLETE|>"
 
+var DefaultEntityTypes = [...]string{"organization", "person", "geo", "event", "role", "electorate"}
+
 type PromptData struct {
 	RecordDelimiter     string
 	TupleDelimiter      string

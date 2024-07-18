@@ -3,7 +3,10 @@ package llm
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/sashabaranov/go-openai"
 )
@@ -37,7 +40,17 @@ func (o *OpenAI) Generate(ctx context.Context, prompt string, opts ...Option) (s
 		return "", ErrNoAPIKey
 	}
 
-	client := openai.NewClient(o.options.APIKey)
+	cfg := openai.DefaultConfig(o.options.APIKey)
+
+	slog.Info("Using cache", "useCache", options.UseCache)
+
+	if options.UseCache {
+		cfg.HTTPClient = &http.Client{
+			Transport: NewCacheTransport(http.DefaultTransport, nil, "./cache", 24*time.Hour),
+		}
+	}
+
+	client := openai.NewClientWithConfig(cfg)
 
 	msgs := []openai.ChatCompletionMessage{}
 

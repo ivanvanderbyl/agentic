@@ -18,6 +18,7 @@ type (
 		Model        string
 		SystemPrompt string
 		Temperature  float64
+		UseCache     bool
 	}
 )
 
@@ -55,5 +56,12 @@ func WithSystemPrompt(systemPrompt string) Option {
 func WithTemperature(temperature float64) Option {
 	return func(o *Options) {
 		o.Temperature = temperature
+	}
+}
+
+// WithCache sets the cache
+func WithCache() Option {
+	return func(o *Options) {
+		o.UseCache = true
 	}
 }
