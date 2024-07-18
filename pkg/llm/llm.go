@@ -10,6 +10,10 @@ type (
 		Generate(ctx context.Context, prompt string, opts ...Option) (string, error)
 	}
 
+	LLMHistory interface {
+		History() []string
+	}
+
 	Option func(*Options)
 
 	Options struct {

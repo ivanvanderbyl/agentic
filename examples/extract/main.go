@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -26,9 +27,13 @@ func realMain(ctx context.Context) error {
 	}
 
 	extractor := entity.NewEntityExtractor(l)
-	err = extractor.Extract(ctx, string(doc))
+	records, err := extractor.Extract(ctx, string(doc))
 	if err != nil {
 		return err
+	}
+
+	for _, record := range records {
+		fmt.Println(record)
 	}
 
 	return nil
