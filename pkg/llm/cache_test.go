@@ -39,6 +39,7 @@ func TestCachingResponses(t *testing.T) {
 	defer server.Close()
 
 	transport := llm.NewCacheTransport(http.DefaultTransport, nil, tmpDir, 0)
+	body := bytes.NewBufferString("Completion Request2")
 
 	tests := []struct {
 		name           string
@@ -48,34 +49,34 @@ func TestCachingResponses(t *testing.T) {
 	}{
 		{
 			name:           "success",
+			req:            httptest.NewRequest("POST", server.URL+"/success", body),
+			expected:       http.StatusOK,
+			shouldBeCached: true,
+		},
+		{
+			name:           "success on read",
 			req:            httptest.NewRequest("POST", server.URL+"/success", bytes.NewBufferString("Completion Request")),
 			expected:       http.StatusOK,
 			shouldBeCached: true,
 		},
-		// {
-		// 	name:           "success on read",
-		// 	req:            httptest.NewRequest("POST", server.URL+"/success", bytes.NewBufferString("Completion Request")),
-		// 	expected:       http.StatusOK,
-		// 	shouldBeCached: true,
-		// },
-		// {
-		// 	name:           "error",
-		// 	req:            httptest.NewRequest("POST", server.URL+"/error", nil),
-		// 	expected:       http.StatusInternalServerError,
-		// 	shouldBeCached: false,
-		// },
+		{
+			name:           "error",
+			req:            httptest.NewRequest("POST", server.URL+"/error", nil),
+			expected:       http.StatusInternalServerError,
+			shouldBeCached: false,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
+			key, err := transport.GetCacheKey(tt.req)
+			a.NoError(err)
+
 			resp, err := transport.RoundTrip(tt.req)
 			a.NoError(err)
 			a.NotNil(resp)
 			a.Equal(tt.expected, resp.StatusCode)
-
-			key, err := transport.GetCacheKey(tt.req)
-			a.NoError(err)
 
 			_, err = os.Stat(filepath.Join(tmpDir, key))
 			if tt.shouldBeCached {
@@ -85,35 +86,4 @@ func TestCachingResponses(t *testing.T) {
 			}
 		})
 	}
-
-	// // Test successful response
-	// successReq := httptest.NewRequest("POST", server.URL+"/success", nil)
-	// successResp, err := transport.RoundTrip(successReq)
-	// a.NoError(err)
-	// a.NotNil(successResp)
-	// a.Equal(http.StatusOK, successResp.StatusCode)
-
-	// // Verify cache entry for successful response
-	// successKey, err := transport.GetCacheKey(successReq)
-	// a.NoError(err)
-	// _, err = os.Stat(filepath.Join(tmpDir, successKey))
-	// a.NoError(err)
-
-	// // Test error response
-	// errorReq := httptest.NewRequest("POST", server.URL+"/error", nil)
-	// errorResp, err := transport.RoundTrip(errorReq)
-	// a.NoError(err)
-	// a.NotNil(errorResp)
-	// a.Equal(http.StatusInternalServerError, errorResp.StatusCode)
-
-	// // Verify cache entry for error response
-	// errorKey, err := transport.GetCacheKey(errorReq)
-	// a.NoError(err)
-	// _, err = os.Stat(filepath.Join(tmpDir, errorKey))
-	// a.NoError(err)
-
-	// // Verify total number of cache entries
-	// entries, err := os.ReadDir(tmpDir)
-	// a.NoError(err)
-	// a.Len(entries, 1)
 }

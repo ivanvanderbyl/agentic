@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"path/filepath"
 	"slices"
@@ -31,6 +32,8 @@ func (t *CacheTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	httputil.DumpRequest(req, true)
 
 	// Check if we have a cached response
 	// If we do, and it's not expired, return it
@@ -70,16 +73,16 @@ func (t *CacheTransport) shouldCache(hostname string) bool {
 }
 
 func (t *CacheTransport) GetCacheKey(req *http.Request) (string, error) {
-	body, err := io.ReadAll(req.Body)
+	var err error
+	var body io.ReadCloser
+	body, req.Body, err = drainBody(req.Body)
 	if err != nil {
 		return "", err
 	}
-	req.Body = io.NopCloser(bytes.NewBuffer(body))
-
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString(req.Method)
-	headerKeys := make([]string, 0, len(req.Header))
 
+	headerKeys := make([]string, 0, len(req.Header))
 	for k := range req.Header {
 		headerKeys = append(headerKeys, k)
 	}
@@ -93,7 +96,11 @@ func (t *CacheTransport) GetCacheKey(req *http.Request) (string, error) {
 	}
 
 	buf.WriteString(req.URL.String())
-	buf.Write(body)
+
+	_, err = buf.ReadFrom(body)
+	if err != nil {
+		return "", err
+	}
 
 	return uuid.NewSHA1(uuid.NameSpaceOID, buf.Bytes()).String(), nil
 }
@@ -190,4 +197,26 @@ func NewCacheTransport(transport http.RoundTripper, cacheDomains []string, cache
 		CachePath:       cachePath,
 		CacheExpiration: cacheExpiration,
 	}
+}
+
+// drainBody reads all of b to memory and then returns two equivalent
+// ReadClosers yielding the same bytes.
+//
+// It returns an error if the initial slurp of all bytes fails. It does not attempt
+// to make the returned ReadClosers have identical error-matching behavior.
+//
+// This function is copied from the Go standard library.
+func drainBody(b io.ReadCloser) (r1, r2 io.ReadCloser, err error) {
+	if b == nil || b == http.NoBody {
+		// No copying needed. Preserve the magic sentinel meaning of NoBody.
+		return http.NoBody, http.NoBody, nil
+	}
+	var buf bytes.Buffer
+	if _, err = buf.ReadFrom(b); err != nil {
+		return nil, b, err
+	}
+	if err = b.Close(); err != nil {
+		return nil, b, err
+	}
+	return io.NopCloser(&buf), io.NopCloser(bytes.NewReader(buf.Bytes())), nil
 }
