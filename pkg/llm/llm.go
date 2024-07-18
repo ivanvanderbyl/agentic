@@ -13,12 +13,13 @@ type (
 	Option func(*Options)
 
 	Options struct {
-		APIKey       string
-		MaxTokens    int
-		Model        string
-		SystemPrompt string
-		Temperature  float64
-		UseCache     bool
+		APIKey         string
+		MaxTokens      int
+		Model          string
+		SystemPrompt   string
+		Temperature    float64
+		UseCache       bool
+		CacheDirectory string
 	}
 )
 
@@ -60,8 +61,9 @@ func WithTemperature(temperature float64) Option {
 }
 
 // WithCache sets the cache
-func WithCache() Option {
+func WithCache(dir string) Option {
 	return func(o *Options) {
 		o.UseCache = true
+		o.CacheDirectory = dir
 	}
 }

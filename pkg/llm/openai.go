@@ -3,10 +3,8 @@ package llm
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/sashabaranov/go-openai"
 )
@@ -31,22 +29,28 @@ func NewOpenAI(opts ...Option) LLM {
 }
 
 func (o *OpenAI) Generate(ctx context.Context, prompt string, opts ...Option) (string, error) {
-	options := &Options{}
+	options := &Options{
+		CacheDirectory: o.options.CacheDirectory,
+		UseCache:       o.options.UseCache,
+		Model:          o.options.Model,
+		MaxTokens:      o.options.MaxTokens,
+		Temperature:    o.options.Temperature,
+		SystemPrompt:   o.options.SystemPrompt,
+		APIKey:         o.options.APIKey,
+	}
 	for _, opt := range opts {
 		opt(options)
 	}
 
-	if o.options.APIKey == "" {
+	if options.APIKey == "" {
 		return "", ErrNoAPIKey
 	}
 
-	cfg := openai.DefaultConfig(o.options.APIKey)
-
-	slog.Info("Using cache", "useCache", options.UseCache)
+	cfg := openai.DefaultConfig(options.APIKey)
 
 	if options.UseCache {
 		cfg.HTTPClient = &http.Client{
-			Transport: NewCacheTransport(http.DefaultTransport, nil, "./cache", 24*time.Hour),
+			Transport: NewCacheTransport(http.DefaultTransport, nil, options.CacheDirectory, 0),
 		}
 	}
 

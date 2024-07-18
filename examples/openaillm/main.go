@@ -19,7 +19,7 @@ func main() {
 func realMain(ctx context.Context) error {
 	l := llm.NewOpenAI()
 	prompt := "A claim that is not supported by evidence"
-	completion, err := l.Generate(ctx, prompt, llm.WithCache())
+	completion, err := l.Generate(ctx, prompt, llm.WithCache(".cache"))
 	if err != nil {
 		return err
 	}

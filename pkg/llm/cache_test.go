@@ -39,7 +39,6 @@ func TestCachingResponses(t *testing.T) {
 	defer server.Close()
 
 	transport := llm.NewCacheTransport(http.DefaultTransport, nil, tmpDir, 0)
-	body := bytes.NewBufferString("Completion Request2")
 
 	tests := []struct {
 		name           string
@@ -49,7 +48,7 @@ func TestCachingResponses(t *testing.T) {
 	}{
 		{
 			name:           "success",
-			req:            httptest.NewRequest("POST", server.URL+"/success", body),
+			req:            httptest.NewRequest("POST", server.URL+"/success", bytes.NewBufferString("Completion Request")),
 			expected:       http.StatusOK,
 			shouldBeCached: true,
 		},
