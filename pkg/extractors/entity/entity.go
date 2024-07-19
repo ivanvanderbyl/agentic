@@ -41,6 +41,8 @@ type (
 		Entity1  string
 		Relation string
 		Entity2  string
+		Keyword  string
+		Weight   int
 	}
 )
 
@@ -57,7 +59,19 @@ func (r *Relationship) Type() string {
 	return "relationship"
 }
 func (r *Relationship) String() string {
-	return fmt.Sprintf("Relationship{From: %q, Relation: %q, To: %q}", r.Entity1, r.Relation, r.Entity2)
+	buf := new(strings.Builder)
+	buf.WriteString("Relationship{")
+	buf.WriteString(fmt.Sprintf("From: %q", r.Entity1))
+	buf.WriteString(", ")
+	buf.WriteString(fmt.Sprintf("Relation: %q", r.Relation))
+	buf.WriteString(", ")
+	buf.WriteString(fmt.Sprintf("To: %q", r.Entity2))
+	buf.WriteString(", ")
+	buf.WriteString(fmt.Sprintf("Keyword: %q", r.Keyword))
+	buf.WriteString(", ")
+	buf.WriteString(fmt.Sprintf("Weight: %d", r.Weight))
+	buf.WriteString("}")
+	return buf.String()
 }
 
 func NewEntityExtractor(llm llm.LLM, opts ...Option) *EntityExtractor {
@@ -91,6 +105,11 @@ func (ee *EntityExtractor) Extract(ctx context.Context, text string) ([]Record, 
 }
 
 func (ee *EntityExtractor) processResults(response string) []Record {
+	before, ok := strings.CutSuffix(response, prompts.DefaultCompletionDelimiter)
+	if ok {
+		response = before
+	}
+
 	parts := strings.Split(response, prompts.DefaultRecordDelimiter)
 	records := make([]string, 0)
 	for _, part := range parts {
@@ -130,10 +149,17 @@ func parseRecord(record string) Record {
 			Description:  attrs[3],
 		}
 	case "relationship":
+		weight, err := strconv.Atoi(attrs[4])
+		if err != nil {
+			weight = 0
+		}
+
 		return &Relationship{
 			Entity1:  attrs[1],
 			Entity2:  attrs[2],
 			Relation: attrs[3],
+			Keyword:  attrs[5],
+			Weight:   weight,
 		}
 	default:
 		return nil
@@ -143,7 +169,10 @@ func parseRecord(record string) Record {
 var re = regexp.MustCompile(`[\x00-\x1f\x7f-\x9f]`)
 
 func cleanString(str string) string {
-	cleaned := strings.TrimSpace(str)
-	cleaned, _ = strconv.Unquote(cleaned)
+	str = strings.TrimSpace(str)
+	cleaned, err := strconv.Unquote(str)
+	if err != nil {
+		cleaned = str
+	}
 	return re.ReplaceAllString(cleaned, "")
 }
