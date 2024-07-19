@@ -15,7 +15,9 @@ require (
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
+	github.com/golang-cz/textcase v1.2.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/neo4j/neo4j-go-driver/v5 v5.22.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -18,7 +18,8 @@ func main() {
 
 func realMain(ctx context.Context) error {
 	l := llm.NewOpenAI()
-	prompt := "A claim that is not supported by evidence"
+	prompt := `Return relationship_keyword: a single word in UPPERCASE to describe the relationship between the source entity and target entity, e.g. "FRIENDSHIP", "RIVALRY", "COLLABORATION", "SUPPORTS", "OPPOSES", "WORKS_IN", "MEMBER_OF", "AFFECTED_BY"
+	Input text: The team is directly involved in Operation: Dulce, executing its evolved objectives and activities.`
 	completion, err := l.Generate(ctx, prompt, llm.WithCache(".cache"))
 	if err != nil {
 		return err
