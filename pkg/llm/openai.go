@@ -13,11 +13,14 @@ type OpenAI struct {
 	options *Options
 }
 
+var _ LLM = (*OpenAI)(nil)
+
 func NewOpenAI(opts ...Option) LLM {
 	options := &Options{
-		Model:     openai.GPT4o,
-		MaxTokens: 4_000,
-		APIKey:    os.Getenv("OPENAI_API_KEY"),
+		Model:      openai.GPT4o,
+		MaxTokens:  4_000,
+		APIKey:     os.Getenv("OPENAI_API_KEY"),
+		Dimensions: DefaultDimensions,
 	}
 	for _, opt := range opts {
 		opt(options)
@@ -90,4 +93,52 @@ func (o *OpenAI) Generate(ctx context.Context, prompt string, opts ...Option) (s
 	}
 
 	return resp.Choices[0].Message.Content, nil
+}
+
+func (o *OpenAI) Embedding(ctx context.Context, input string, opts ...Option) ([]float32, error) {
+	options := &Options{
+		CacheDirectory: o.options.CacheDirectory,
+		UseCache:       o.options.UseCache,
+		Model:          o.options.Model,
+		MaxTokens:      o.options.MaxTokens,
+		Temperature:    o.options.Temperature,
+		SystemPrompt:   o.options.SystemPrompt,
+		APIKey:         o.options.APIKey,
+		Dimensions:     o.options.Dimensions,
+	}
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if options.APIKey == "" {
+		return nil, ErrNoAPIKey
+	}
+
+	cfg := openai.DefaultConfig(options.APIKey)
+
+	if options.UseCache {
+		cfg.HTTPClient = &http.Client{
+			Transport: NewCacheTransport(http.DefaultTransport, nil, options.CacheDirectory, 0),
+		}
+	}
+
+	client := openai.NewClientWithConfig(cfg)
+
+	req := openai.EmbeddingRequest{
+		Model:          openai.SmallEmbedding3,
+		EncodingFormat: openai.EmbeddingEncodingFormatFloat,
+		Dimensions:     options.Dimensions,
+		Input:          input,
+	}
+
+	resp, err := client.CreateEmbeddings(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(resp.Data) == 0 {
+		return nil, fmt.Errorf("no embeddings returned")
+	}
+
+	return resp.Data[0].Embedding, nil
 }

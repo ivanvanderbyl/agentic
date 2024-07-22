@@ -8,6 +8,7 @@ import (
 type (
 	LLM interface {
 		Generate(ctx context.Context, prompt string, opts ...Option) (string, error)
+		Embedding(ctx context.Context, input string, opts ...Option) ([]float32, error)
 	}
 
 	LLMHistory interface {
@@ -17,14 +18,19 @@ type (
 	Option func(*Options)
 
 	Options struct {
-		APIKey         string
-		MaxTokens      int
-		Model          string
-		SystemPrompt   string
-		Temperature    float64
-		UseCache       bool
-		CacheDirectory string
+		APIKey         string  // API Key for underlying service
+		MaxTokens      int     // Max tokens to generate when generating text
+		Dimensions     int     // Embedding dimensions to generate when embedding
+		Model          string  // Model to use
+		SystemPrompt   string  // System prompt for completion
+		Temperature    float64 // Temperature for sampling
+		UseCache       bool    // Enable HTTP Request caching
+		CacheDirectory string  // Directory to store cache
 	}
+)
+
+const (
+	DefaultDimensions = 1536 // Default dimensions for embeddings based on OpenAI's embedding small model
 )
 
 var ErrNoAPIKey = fmt.Errorf("API key is required")
@@ -40,6 +46,13 @@ func WithAPIKey(apiKey string) Option {
 func WithMaxTokens(maxTokens int) Option {
 	return func(o *Options) {
 		o.MaxTokens = maxTokens
+	}
+}
+
+// WithDimensions sets the dimensions
+func WithDimensions(dimensions int) Option {
+	return func(o *Options) {
+		o.Dimensions = dimensions
 	}
 }
 
