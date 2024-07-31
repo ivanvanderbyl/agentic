@@ -52,15 +52,19 @@ func realMain(ctx context.Context) error {
 	}
 
 	indexes := []string{
-		"DROP GRAPH;",
+		// "DROP GRAPH;",
 		"CREATE INDEX ON :Policy(id);",
-		"CREATE INDEX ON :Policy(name);",
+		// "CREATE INDEX ON :Policy(name);",
+		"CREATE INDEX ON :Policy(embedding);",
 		"CREATE INDEX ON :Person(id);",
-		"CREATE INDEX ON :Person(name);",
+		// "CREATE INDEX ON :Person(name);",
+		"CREATE INDEX ON :Person(embedding);",
 		"CREATE INDEX ON :Bill(id);",
-		"CREATE INDEX ON :Bill(name);",
+		// "CREATE INDEX ON :Bill(name);",
+		"CREATE INDEX ON :Bill(embedding);",
 		"CREATE INDEX ON :Organization(id);",
-		"CREATE INDEX ON :Organization(name);",
+		// "CREATE INDEX ON :Organization(name);",
+		"CREATE INDEX ON :Organization(embedding);",
 	}
 
 	slog.Info("Extracting entities from document")
@@ -93,11 +97,13 @@ func realMain(ctx context.Context) error {
 
 			nodeType := pascalCase(r.Type())
 
-			_, err := session.Run(ctx, "CREATE (e:$nodeType {type: $type, name: $name, description: $description}) RETURN e", map[string]interface{}{
+			_, err := session.Run(ctx, "MERGE (e:$nodeType {id: $id, type: $type, name: $name, description: $description, embedding: $embedding}) RETURN e", map[string]interface{}{
+				"id":          r.NodeID(),
 				"nodeType":    nodeType,
 				"type":        r.Type(),
 				"name":        r.Name,
 				"description": r.Description,
+				"embedding":   r.Embedding,
 			})
 			if err != nil {
 				return err
@@ -121,7 +127,7 @@ func realMain(ctx context.Context) error {
 				continue
 			}
 
-			query := fmt.Sprintf("MATCH (from:$fromEntity {name: $from}), (to:$toEntity {name: $to}) CREATE (from)-[:%s {relation: $relation, weight: $weight}]->(to)", relationType)
+			query := fmt.Sprintf("MATCH (from:$fromEntity {name: $from}), (to:$toEntity {name: $to}) MERGE (from)-[:%s {relation: $relation, weight: $weight}]->(to)", relationType)
 
 			_, err = session.Run(ctx, query, map[string]interface{}{
 				"from":       r.Entity1,

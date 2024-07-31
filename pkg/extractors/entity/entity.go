@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/ivanvanderbyl/graphrag-go/pkg/llm"
 	"github.com/ivanvanderbyl/graphrag-go/pkg/prompts"
 )
@@ -15,6 +16,7 @@ type (
 	EntityExtractor struct {
 		llm              llm.LLM
 		ExtractionPrompt string
+		EntityTypes      []string
 		MaxGleanings     int
 	}
 
@@ -28,12 +30,15 @@ type (
 
 	Record interface {
 		isNode()
+		NodeID() string
 		Type() string
 	}
 
 	Entity struct {
 		Name         string
 		Description  string
+		Embedding    []float32
+		id           string
 		internalType string
 	}
 
@@ -43,6 +48,7 @@ type (
 		Entity2  string
 		Keyword  string
 		Weight   int
+		id       string
 	}
 )
 
@@ -53,10 +59,16 @@ func (e *Entity) Type() string {
 func (e *Entity) String() string {
 	return fmt.Sprintf("Entity{Type: %q, Name: %q, Description: %q}", e.internalType, e.Name, e.Description)
 }
+func (e *Entity) NodeID() string {
+	return e.id
+}
 
 func (Relationship) isNode() {}
 func (r *Relationship) Type() string {
 	return "relationship"
+}
+func (e *Relationship) NodeID() string {
+	return e.id
 }
 func (r *Relationship) String() string {
 	buf := new(strings.Builder)
@@ -74,9 +86,12 @@ func (r *Relationship) String() string {
 	return buf.String()
 }
 
+var DefaultEntityTypes = []string{"organization", "person", "policy", "bill", "geo", "event", "role", "electorate"}
+
 func NewEntityExtractor(llm llm.LLM, opts ...Option) *EntityExtractor {
 	e := &EntityExtractor{
-		llm: llm,
+		llm:         llm,
+		EntityTypes: DefaultEntityTypes,
 	}
 	for _, opt := range opts {
 		opt(e)
@@ -84,9 +99,15 @@ func NewEntityExtractor(llm llm.LLM, opts ...Option) *EntityExtractor {
 	return e
 }
 
+func WithEntityTypes(types []string) Option {
+	return func(e *EntityExtractor) {
+		e.EntityTypes = types
+	}
+}
+
 func (ee *EntityExtractor) Extract(ctx context.Context, text string) ([]Record, error) {
 	prompt, err := prompts.RenderTemplate(prompts.EntitiesTemplate, Data{
-		EntityTypes: []string{"organization", "person", "policy", "bill", "geo", "event", "role", "electorate"},
+		EntityTypes: ee.EntityTypes,
 		PromptData:  prompts.DefaultPromptData,
 		InputText:   text,
 	})
@@ -101,7 +122,25 @@ func (ee *EntityExtractor) Extract(ctx context.Context, text string) ([]Record, 
 
 	records := ee.processResults(resp)
 
+	if err := ee.createEmbeddings(ctx, records); err != nil {
+		return nil, err
+	}
+
 	return records, nil
+}
+
+func (ee *EntityExtractor) createEmbeddings(ctx context.Context, records []Record) error {
+	for _, record := range records {
+		switch r := record.(type) {
+		case *Entity:
+			embedding, err := ee.llm.Embedding(ctx, r.Description)
+			if err != nil {
+				return err
+			}
+			r.Embedding = embedding
+		}
+	}
+	return nil
 }
 
 func (ee *EntityExtractor) processResults(response string) []Record {
@@ -143,10 +182,13 @@ func parseRecord(record string) Record {
 	recordType := attrs[0]
 	switch recordType {
 	case "entity":
+		id := uuid.NewSHA1(uuid.NameSpaceOID, []byte(fmt.Sprintf("%s%s", attrs[1], attrs[3])))
+
 		return &Entity{
 			Name:         attrs[1],
 			internalType: attrs[2],
 			Description:  attrs[3],
+			id:           id.String(),
 		}
 	case "relationship":
 		weight, err := strconv.Atoi(attrs[4])
@@ -154,12 +196,15 @@ func parseRecord(record string) Record {
 			weight = 0
 		}
 
+		id := uuid.NewSHA1(uuid.NameSpaceOID, []byte(fmt.Sprintf("%s%s%s", attrs[1], attrs[2], attrs[3])))
+
 		return &Relationship{
 			Entity1:  attrs[1],
 			Entity2:  attrs[2],
 			Relation: attrs[3],
 			Keyword:  attrs[5],
 			Weight:   weight,
+			id:       id.String(),
 		}
 	default:
 		return nil
