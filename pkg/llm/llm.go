@@ -11,6 +11,11 @@ type (
 		Embedding(ctx context.Context, input string, opts ...Option) ([]float32, error)
 	}
 
+	StreamingLLM interface {
+		LLM
+		Stream(ctx context.Context, prompt string, opts ...Option) (<-chan string, error)
+	}
+
 	LLMHistory interface {
 		History() []string
 	}
