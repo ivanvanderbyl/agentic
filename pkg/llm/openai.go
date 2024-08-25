@@ -13,6 +13,10 @@ type OpenAI struct {
 	options *Options
 }
 
+const (
+	ModelTextEmbedding3Small = "text-embedding-3-small"
+)
+
 var _ LLM = (*OpenAI)(nil)
 
 func NewOpenAI(opts ...Option) LLM {
