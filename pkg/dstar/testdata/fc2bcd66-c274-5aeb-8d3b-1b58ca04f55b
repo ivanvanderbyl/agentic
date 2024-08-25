@@ -1,0 +1,48 @@
+HTTP/2.0 200 OK
+Content-Length: 558
+Alt-Svc: h3=":443"; ma=86400
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: 8b5ff3e7fc9f50c8-AKL
+Content-Type: application/json
+Date: Tue, 20 Aug 2024 05:23:42 GMT
+Openai-Organization: user-jp4jch3by1gsi52drngabsx7
+Openai-Processing-Ms: 772
+Openai-Version: 2020-10-01
+Server: cloudflare
+Set-Cookie: __cf_bm=aZcHN2K2JnE_.JMsYLpDNhAjD8Tey2cGTNYf02IFRng-1724131422-1.0.1.1-oduZfkJAhwhITtngX53UGeFomjKVilk.EiMzoOz9hUXN7JVa02sdeKVt4nREGSmoQ9rmcgAhtIOwjHdWYS54og; path=/; expires=Tue, 20-Aug-24 05:53:42 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+Set-Cookie: _cfuvid=O41ujZNTLnupUTA.WZKArTFjOJ8Mdtz54feDNWELT7c-1724131422615-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+Strict-Transport-Security: max-age=15552000; includeSubDomains; preload
+X-Cache-Time: 2024-08-20T17:23:42+12:00
+X-Content-Type-Options: nosniff
+X-Ratelimit-Limit-Requests: 5000
+X-Ratelimit-Limit-Tokens: 450000
+X-Ratelimit-Remaining-Requests: 4999
+X-Ratelimit-Remaining-Tokens: 444830
+X-Ratelimit-Reset-Requests: 12ms
+X-Ratelimit-Reset-Tokens: 689ms
+X-Request-Id: req_4a86a121324198b6f594259816ffe9cb
+
+{
+  "id": "chatcmpl-9yBdFzE7xdbZImQK9UYfPrgBasNNi",
+  "object": "chat.completion",
+  "created": 1724131421,
+  "model": "gpt-4o-2024-05-13",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Speech by Ananda-Rajah, Michelle MP (Party: ALP, Electorate: Higgins)",
+        "refusal": null
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1004,
+    "completion_tokens": 21,
+    "total_tokens": 1025
+  },
+  "system_fingerprint": "fp_3aa7262c27"
+}

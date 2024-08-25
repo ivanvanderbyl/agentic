@@ -1,0 +1,48 @@
+HTTP/2.0 200 OK
+Content-Length: 777
+Alt-Svc: h3=":443"; ma=86400
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: 8b5ff51e49ab1c53-AKL
+Content-Type: application/json
+Date: Tue, 20 Aug 2024 05:24:32 GMT
+Openai-Organization: user-jp4jch3by1gsi52drngabsx7
+Openai-Processing-Ms: 863
+Openai-Version: 2020-10-01
+Server: cloudflare
+Set-Cookie: __cf_bm=4s04xTbyYnNjw4ITOYbqUYpLdbhdB2tHIBodQAWlWqs-1724131472-1.0.1.1-A7qKtPy0gvsH4lC2xrqfNJnY2myU.raJOwHdKtL.4F.bLF.oaNwW0a7grm8V5yVGFDmuG_te48IJiC2bRXyJ5g; path=/; expires=Tue, 20-Aug-24 05:54:32 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+Set-Cookie: _cfuvid=cUIgfL5RImmjaOSKhIxLt8RV2lxepEl3OHE86.1lqu0-1724131472252-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+Strict-Transport-Security: max-age=15552000; includeSubDomains; preload
+X-Cache-Time: 2024-08-20T17:24:32+12:00
+X-Content-Type-Options: nosniff
+X-Ratelimit-Limit-Requests: 5000
+X-Ratelimit-Limit-Tokens: 450000
+X-Ratelimit-Remaining-Requests: 4999
+X-Ratelimit-Remaining-Tokens: 444397
+X-Ratelimit-Reset-Requests: 12ms
+X-Ratelimit-Reset-Tokens: 747ms
+X-Request-Id: req_ab1262a9826815a3e16b68b5f019549d
+
+{
+  "id": "chatcmpl-9yBe3AVZffFGkhqCsGSljClWocbOC",
+  "object": "chat.completion",
+  "created": 1724131471,
+  "model": "gpt-4o-2024-05-13",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "This document is about: a speech by Peter Khalil, a member of parliament representing the electorate of Wills, discussing his activities in support of his community, particularly the elderly and victims of domestic violence, and highlighting government initiatives to assist these groups.",
+        "refusal": null
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1350,
+    "completion_tokens": 50,
+    "total_tokens": 1400
+  },
+  "system_fingerprint": "fp_3aa7262c27"
+}

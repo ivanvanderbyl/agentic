@@ -1,0 +1,48 @@
+HTTP/2.0 200 OK
+Content-Length: 704
+Alt-Svc: h3=":443"; ma=86400
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: 8b5ff3ef8a2950c8-AKL
+Content-Type: application/json
+Date: Tue, 20 Aug 2024 05:23:44 GMT
+Openai-Organization: user-jp4jch3by1gsi52drngabsx7
+Openai-Processing-Ms: 706
+Openai-Version: 2020-10-01
+Server: cloudflare
+Set-Cookie: __cf_bm=ZUQPuwRcNatYvgD6b2hAUnUYJxwLAHwdZ1c8purZ0X4-1724131424-1.0.1.1-ziOyWt8FU29hRZs37Wn1PJm5Sb8U0012IafShs3gruVgCGOAbon.F4A9UmtSDPMSLcayLg.6xCO7CtP1V9HLJA; path=/; expires=Tue, 20-Aug-24 05:53:44 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+Set-Cookie: _cfuvid=JQ9IvKCJjeE8A5K332W16bh4TlBJz5L2EctoVF7awog-1724131424209-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+Strict-Transport-Security: max-age=15552000; includeSubDomains; preload
+X-Cache-Time: 2024-08-20T17:23:44+12:00
+X-Content-Type-Options: nosniff
+X-Ratelimit-Limit-Requests: 5000
+X-Ratelimit-Limit-Tokens: 450000
+X-Ratelimit-Remaining-Requests: 4999
+X-Ratelimit-Remaining-Tokens: 444615
+X-Ratelimit-Reset-Requests: 12ms
+X-Ratelimit-Reset-Tokens: 718ms
+X-Request-Id: req_a7631b7fecabf69cc5e5f4bb07f3acaa
+
+{
+  "id": "chatcmpl-9yBdHd07CV6JcedE6TL1jrUqGTgj8",
+  "object": "chat.completion",
+  "created": 1724131423,
+  "model": "gpt-4o-2024-05-13",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "This document is about: Michelle MP Ananda-Rajah's speech addressing issues related to ME/CFS research funding and clinical guidelines, as well as the cost-of-living and pricing practices in Australian supermarkets.",
+        "refusal": null
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1191,
+    "completion_tokens": 41,
+    "total_tokens": 1232
+  },
+  "system_fingerprint": "fp_3aa7262c27"
+}

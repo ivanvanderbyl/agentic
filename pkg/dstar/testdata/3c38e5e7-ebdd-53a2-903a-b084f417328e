@@ -1,0 +1,48 @@
+HTTP/2.0 200 OK
+Content-Length: 547
+Alt-Svc: h3=":443"; ma=86400
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: 8b5ff5175e961c53-AKL
+Content-Type: application/json
+Date: Tue, 20 Aug 2024 05:24:31 GMT
+Openai-Organization: user-jp4jch3by1gsi52drngabsx7
+Openai-Processing-Ms: 668
+Openai-Version: 2020-10-01
+Server: cloudflare
+Set-Cookie: __cf_bm=ViKS0k7354A5VglyrGh6jQS6AIWLxaRGKB2t5Y0cFT8-1724131471-1.0.1.1-CqbNeFdc0zMmszc.WGjoU_m3GYDI6RsmTX78bbnT64o1VQwLMI3xICTOc1VMlENqAiGZEFV8SCp6SOZduwsAQQ; path=/; expires=Tue, 20-Aug-24 05:54:31 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+Set-Cookie: _cfuvid=GbC1hCW9E9cZBiMze520bE8K0g.IaJePcWKsK8aF8zA-1724131471058-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+Strict-Transport-Security: max-age=15552000; includeSubDomains; preload
+X-Cache-Time: 2024-08-20T17:24:31+12:00
+X-Content-Type-Options: nosniff
+X-Ratelimit-Limit-Requests: 5000
+X-Ratelimit-Limit-Tokens: 450000
+X-Ratelimit-Remaining-Requests: 4999
+X-Ratelimit-Remaining-Tokens: 444609
+X-Ratelimit-Reset-Requests: 12ms
+X-Ratelimit-Reset-Tokens: 718ms
+X-Request-Id: req_4c4411546cb5278854940c0f19b3b337
+
+{
+  "id": "chatcmpl-9yBe2lTRC5n9o30q1K8dyjjOO7Fue",
+  "object": "chat.completion",
+  "created": 1724131470,
+  "model": "gpt-4o-2024-05-13",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Speech by Khalil, Peter MP (Party: ALP, Electorate: Wills)",
+        "refusal": null
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1164,
+    "completion_tokens": 20,
+    "total_tokens": 1184
+  },
+  "system_fingerprint": "fp_3aa7262c27"
+}
